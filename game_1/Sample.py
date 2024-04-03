@@ -1,6 +1,7 @@
 import STcpClient
 import numpy as np
 import random
+from pprint import pprint
 
 '''
     選擇起始位置
@@ -18,7 +19,40 @@ def InitPos(mapStat):
         Write your code here
 
     '''
-    return init_pos
+    metadata = np.zeros((12, 12, 4))
+    for i in range(12):
+        for j in range(12):
+            if mapStat[i][j] == 0:
+                
+                for k in range(i, 12):
+                    for l in range(j, 12):
+                        metadata[k][l][0] += 1
+
+                for k in range(i, 12):
+                    for l in range(j, -1, -1):
+                        metadata[k][l][1] += 1
+                
+                for k in range(i, -1, -1):
+                    for l in range(j, 12):
+                        metadata[k][l][2] += 1
+                
+                for k in range(i, -1, -1):
+                    for l in range(j, -1, -1):
+                        metadata[k][l][3] += 1
+    distance = np.full((12, 12), 10000)
+    priority = []
+    for i in range(12):
+        for j in range(12):
+            for k in range(4):
+                distance[i][j] = min(distance[i][j], abs(metadata[i][j][k]-20)) # hack 20 is viable for 16
+            priority.append((distance[i][j], i, j))
+    priority.sort()
+    for _, i, j in priority:
+        if mapStat[i][j] == -1:
+            continue
+        for (l,r) in (-1, 0), (1, 0), (0, -1), (0, 1):
+            if 0 <= i+l < 12 and 0 <= j+r < 12 and mapStat[i+l][j+r] == -1:
+                return [i, j]
 
 
 '''
@@ -62,3 +96,8 @@ while (True):
     Step = GetStep(playerID, mapStat, sheepStat)
 
     STcpClient.SendStep(id_package, Step)
+
+# if __name__ == '__main__':
+#     import random
+#     mapStat = [[ random.randint(0,1) for i in range(12)] for j in range(12)]
+#     InitPos(mapStat)
