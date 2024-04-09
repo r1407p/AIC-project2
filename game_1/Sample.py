@@ -3,7 +3,7 @@ import numpy as np
 import random
 from copy import deepcopy
 from pprint import pprint
-
+import time
 '''
     選擇起始位置
     選擇範圍僅限場地邊緣(至少一個方向為牆)
@@ -28,6 +28,11 @@ def generate(x, y):
         res.append((x, i))
         res.append((y, i))
     return res
+# def generate(mapStat, x, y):
+#     mapStat[x][y] = 1
+#     sheepStat = deepcopy(mapStat)
+#     sheepStat[x][y] = 16
+#     return mapStat, sheepStat
     
 def InitPos(mapStat):
     init_pos = [0, 0]
@@ -126,7 +131,38 @@ def get_target(i, j, l, r, mapStat):
     return target_i, target_j
     
 valid_dir = [(-1,-1,1), (0,-1,2), (1,-1,3), (-1,0,4), (1,0,6), (-1,1,7), (0,1,8), (1,1,9)]    
-
+def deparate(m):
+    if m == 2:
+        return [1]
+    if m == 3:
+        return [1, 2]
+    if m == 4:
+        return [1, 3]
+    if m == 5:
+        return [2, 3]
+    if m == 6:
+        return [2, 3, 4]
+    if m == 7:
+        return [2, 3, 4, 5]
+    if m == 8:
+        return [1, 3, 4, 5, 7]
+    if m == 9:
+        return [1, 4, 5, 8]
+    if m == 10:
+        return [1, 4, 5, 6, 9]
+    if m == 11:
+        return [1,  5, 6,  10]
+    if m == 12:
+        return [1, 4, 6, 8, 11]
+    if m == 13:
+        return [1, 4,  6, 7, 9, 12]
+    if m == 14:
+        return [1, 3,  6, 7, 8,10, 12]
+    if m == 15:
+        return [1, 3,   7, 8,  11, 14]
+    if m == 16:
+        return [1, 4,  7, 8, 9, 12, 15]
+    
 def get_possible_move(playerID, mapStat, sheepStat):    
     current_pos = []
     for i in range(12):
@@ -147,11 +183,14 @@ def get_possible_move(playerID, mapStat, sheepStat):
     # get all possible move with number of sheep
     all_possible_move = []
     for pos in move:
-        new_pos = deepcopy(pos)
-        remain = pos.m //2
-        new_pos.m -= remain 
-        new_pos.target_m = remain
-        all_possible_move.append(new_pos)
+        for remain in deparate(pos.m):
+            new_pos = deepcopy(pos)
+            new_pos.m -= remain 
+            new_pos.target_m = remain
+            all_possible_move.append(deepcopy(new_pos))
+        # new_pos.m -= remain 
+        # new_pos.target_m = remain
+        # all_possible_move.append(new_pos)
     return all_possible_move
 
 def calculate_score(mapStat, sheepStat, playerID):
@@ -195,6 +234,7 @@ def calculate_score(mapStat, sheepStat, playerID):
     return rounded_score
 
 def GetStep(playerID, mapStat, sheepStat):
+    start_time = time.time()
     step = [(0, 0), 0, 1]
     # get current movable position
     tree = []
@@ -203,12 +243,14 @@ def GetStep(playerID, mapStat, sheepStat):
         pos.set_res(pos.i, pos.j,pos.dir, pos.m)
     total = len(tree[0])
     current_layer = 0
-    while total < 1000:
+    while total < 1300:
         current_layer += 1
         tree.append([])
         for pos in tree[current_layer-1]:
             current_mapStat, current_sheepStat = pos.get_next_state()
             new_moves = get_possible_move(playerID, current_mapStat, current_sheepStat)
+            if len(new_moves) == 0:
+                tree[current_layer].append(pos)
             for new_pos in new_moves:
                 new_pos.set_res(pos.res_i, pos.res_j, pos.res_dir, pos.res_m)
                 tree[current_layer].append(new_pos)
@@ -218,12 +260,15 @@ def GetStep(playerID, mapStat, sheepStat):
             break    
         
         total += len(tree[current_layer])
-    
+    print(current_layer)
     # calculate score
     score = []
     for pos in tree[current_layer]:
+        current_mapStat, current_sheepStat = pos.get_next_state()
         score.append((calculate_score(current_mapStat, current_sheepStat, playerID), pos.res_i, pos.res_j, pos.res_dir, pos.res_m))
     score.sort(reverse=True)
+    # for _ in score:
+    #     print(_)
     # pprint(score)
     # return the best move
     step[0] = (score[0][1], score[0][2])
@@ -231,6 +276,33 @@ def GetStep(playerID, mapStat, sheepStat):
     step[2] = score[0][3]
     # pprint(step)
     return step
+    # score = {}
+    # count = {}
+    # for pos in tree[current_layer]:
+    #         current_mapStat, current_sheepStat = pos.get_next_state()
+    #         score_ = calculate_score(current_mapStat, current_sheepStat, playerID)
+    #         # print(score_)
+    #         hash_value = int(pos.res_i * 1000000 + pos.res_j * 10000 + pos.res_dir * 100 + pos.res_m)
+    #         score[hash_value] = score.get(hash_value, 0) + score_
+    #         count[hash_value] = count.get(hash_value, 0) + 1
+    #     max_score = 0
+    #     max_key = 0
+    #     for key, value in score.items():
+    #         print(key, value, count[key], value/count[key])
+    #         if value/count[key] > max_score:
+    #             max_score = value
+    #             max_key = key
+    #     res_m = max_key % 100
+    #     max_key //= 100
+    #     res_dir = max_key % 100
+    #     max_key //= 100
+    #     res_j = max_key % 100
+    #     max_key //= 100
+    #     res_i = max_key % 100
+    #     step[0] = (res_i, res_j)
+    #     step[1] = res_m
+    #     step[2] = res_dir
+    #     return step
     '''
     Write your code here
     
