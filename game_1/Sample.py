@@ -33,24 +33,75 @@ def generate(x, y):
 #     sheepStat = deepcopy(mapStat)
 #     sheepStat[x][y] = 16
 #     return mapStat, sheepStat
-    
-def InitPos(mapStat):
-    init_pos = [0, 0]
-    center = 5  # Center index of a 12x12 board
-    for i in range(center, -1, -1):  # Iterate from the middle ring towards the outer rings
-        positions = generate(i,11 -i)
-        print(positions)
-        for pos in positions:
-            print(pos, mapStat[pos[0]][pos[1]])
-            if is_valid(pos[0], pos[1], mapStat):
-                init_pos = pos
-                return init_pos
-    return init_pos  # If no valid starting position is found, return the default [0, 0]
-    # if no viable position, return the first empty position
-    for i in range(12):
-        for j in range(12):
+def get_possible_init_pos(mapStat):
+    h, w = mapStat.shape
+    possible_pos = []
+    for i in range(h):
+        for j in range(w):
             if mapStat[i][j] == 0:
-                return [i, j]
+                if i == 0 or i == h-1 or j == 0 or j == w-1:
+                    possible_pos.append((i, j))
+                elif mapStat[i-1][j] == -1 or mapStat[i+1][j] == -1 or mapStat[i][j-1] == -1 or mapStat[i][j+1] == -1:
+                    possible_pos.append((i, j))
+    pos = []
+    for p in possible_pos:
+        next_map = deepcopy(mapStat)
+        next_map[p[0]][p[1]] = playerID
+        next_sheep = deepcopy(mapStat)
+        for i in range(h):
+            for j in range(w):
+                if next_sheep[i][j] == -1:
+                    next_sheep[i][j] = 0
+                elif next_sheep[i][j] > 0:
+                    next_sheep[i][j] = 16
+        next_sheep[p[0]][p[1]] = 16
+        pos.append(Movement(playerID, p[0], p[1], 16, next_map, next_sheep))
+    return pos
+
+def InitPos(mapStat):
+    pos = (0, 0)
+    # get current movable position
+    tree = []
+    tree.append(get_possible_init_pos(mapStat))
+    for pos in tree[0]:
+        pos.set_res(pos.i, pos.j,pos.dir, pos.m)
+    total = len(tree[0])
+    print(total)
+    current_layer = 0
+    while total < 1000:
+        current_layer += 1
+        tree.append([])
+        for pos in tree[current_layer-1]:
+            current_mapStat, current_sheepStat = pos.get_next_state()
+            new_moves = get_possible_move(playerID, current_mapStat, current_sheepStat)
+            for new_pos in new_moves:
+                new_pos.set_res(pos.res_i, pos.res_j, pos.res_dir, pos.res_m)
+                tree[current_layer].append(new_pos)
+                
+        if len(tree[current_layer]) == 0:
+            current_layer -= 1
+            break
+        print(total)
+        total += len(tree[current_layer])
+    
+    # calculate score
+    score = []
+    dict = {}
+    for pos in tree[current_layer]:
+        current_mapStat, current_sheepStat = pos.get_next_state()
+        score.append((calculate_score(current_mapStat, current_sheepStat, playerID), pos.res_i, pos.res_j, pos.res_dir, pos.res_m))
+        if (pos.res_i, pos.res_j) not in dict:
+            dict[(pos.res_i, pos.res_j)] = 1
+        else:
+            dict[(pos.res_i, pos.res_j)] += 1
+    max_cnt = 0
+    choosen_pos = (tree[0][0].i, tree[0][0].j)
+    for key in dict:
+        if dict[key] > max_cnt:
+            max_cnt = dict[key]
+            choosen_pos = key
+
+    return choosen_pos
 '''
     產出指令
     
@@ -137,31 +188,31 @@ def deparate(m):
     if m == 3:
         return [1, 2]
     if m == 4:
-        return [1, 3]
+        return [1,2, 3]
     if m == 5:
         return [2, 3]
     if m == 6:
         return [2, 3, 4]
     if m == 7:
-        return [2, 3, 4, 5]
+        return [3, 4]
     if m == 8:
-        return [1, 3, 4, 5, 7]
+        return [4, 2, 6]
     if m == 9:
-        return [1, 4, 5, 8]
+        return [4, 2, 7]
     if m == 10:
-        return [1, 4, 5, 6, 9]
+        return [5, 3, 7]
     if m == 11:
-        return [1,  5, 6,  10]
+        return [6, 4, 8]
     if m == 12:
-        return [1, 4, 6, 8, 11]
+        return [6, 4,  8]
     if m == 13:
-        return [1, 4,  6, 7, 9, 12]
+        return [6, 4, 9]
     if m == 14:
-        return [1, 3,  6, 7, 8,10, 12]
+        return [7, 3, 10]
     if m == 15:
-        return [1, 3,   7, 8,  11, 14]
+        return [7, 3, 11]
     if m == 16:
-        return [1, 4,  7, 8, 9, 12, 15]
+        return [8, 4,  12]
     
 def get_possible_move(playerID, mapStat, sheepStat):    
     current_pos = []
@@ -243,7 +294,7 @@ def GetStep(playerID, mapStat, sheepStat):
         pos.set_res(pos.i, pos.j,pos.dir, pos.m)
     total = len(tree[0])
     current_layer = 0
-    while total < 1300:
+    while total < 1000:
         current_layer += 1
         tree.append([])
         for pos in tree[current_layer-1]:

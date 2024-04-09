@@ -1,0 +1,195 @@
+Scoreboards:
+=====================================
+player 1=team 1 : 28.08071
+player 2=team 2 : 22.16121
+player 3=team 3 : 6.37841
+player 4=team 4 : 16.58846
+Winner : team [1], Score= 28.08071
+=====================================
+player 1=team 1 : 27.08071
+player 2=team 2 : 23.24531
+player 3=team 3 : 23.03276
+player 4=team 4 : 11.47674
+Winner : team [1], Score= 27.08071
+=====================================
+player 1=team 1 : 16.51201
+player 2=team 2 : 18.40256
+player 3=team 3 : 17.58846
+player 4=team 4 : 19.99558
+Winner : team [4], Score= 19.99558
+=====================================
+player 1=team 1 : 19.78279
+player 2=team 2 : 20.03276
+player 3=team 3 : 20.78279
+player 4=team 4 : 22.70422
+Winner : team [4], Score= 22.70422
+=====================================
+player 1=team 1 : 22.03276
+player 2=team 2 : 12.27486
+player 3=team 3 : 17.14286
+player 4=team 4 : 11.65685
+Winner : team [1], Score= 22.03276
+=====================================
+player 1=team 1 : 21.03276
+player 2=team 2 : 13.45434
+player 3=team 3 : 17.58846
+player 4=team 4 : 11.38604
+Winner : team [1], Score= 21.03276
+=====================================
+player 1=team 1 : 16.80338
+player 2=team 2 : 12.42497
+player 3=team 3 : 12.70505
+player 4=team 4 : 9.37841
+Winner : team [1], Score= 16.80338
+=====================================
+player 1=team 1 : 17.78279
+player 2=team 2 : 13.76892
+player 3=team 3 : 13.69212
+player 4=team 4 : 19.78279
+Winner : team [4], Score= 19.78279
+=====================================
+player 1=team 1 : 15.83276
+player 2=team 2 : 15.39051
+player 3=team 3 : 14.38604
+player 4=team 4 : 24.68478
+Winner : team [4], Score= 24.68478
+=====================================
+player 1=team 1 : 15.45434
+player 2=team 2 : 19.78101
+player 3=team 3 : 19.58846
+player 4=team 4 : 18.18179
+Winner : team [2], Score= 19.78101
+=====================================
+player 1=team 1 : 13.45434
+player 2=team 2 : 10.70505
+player 3=team 3 : 12.32664
+player 4=team 4 : 16.23357
+Winner : team [4], Score= 16.23357
+=====================================
+player 1=team 1 : 21.1112
+player 2=team 2 : 13.76445
+player 3=team 3 : 14.33873
+player 4=team 4 : 14.33873
+Winner : team [1], Score= 21.1112
+=====================================
+player 1=team 1 : 9.03527
+player 2=team 2 : 15.08346
+player 3=team 3 : 13.60508
+player 4=team 4 : 7.65685
+Winner : team [2], Score= 15.08346
+=====================================
+player 1=team 1 : 15.58846
+player 2=team 2 : 25.68478
+player 3=team 3 : 15.1336
+player 4=team 4 : 12.42497
+Winner : team [2], Score= 25.68478
+=====================================
+player 1=team 1 : 24.68478
+player 2=team 2 : 17.96687
+player 3=team 3 : 19.74032
+player 4=team 4 : 9.94822
+Winner : team [1], Score= 24.68478
+=====================================
+player 1=team 1 : 18.96687
+player 2=team 2 : 12.23357
+player 3=team 3 : 19.86725
+player 4=team 4 : 17.78279
+Winner : team [3], Score= 19.86725
+=====================================
+player 1=team 1 : 25.33452
+player 2=team 2 : 13.47674
+player 3=team 3 : 29.08071
+player 4=team 4 : 6.37841
+Winner : team [3], Score= 29.08071
+=====================================
+player 1=team 1 : 18.86278
+player 2=team 2 : 17.14286
+player 3=team 3 : 16.3619
+player 4=team 4 : 17.26193
+Winner : team [1], Score= 18.86278
+=====================================
+player 1=team 1 : 22.03276
+player 2=team 2 : 15.45434
+player 3=team 3 : 16.33426
+player 4=team 4 : 19.86278
+Winner : team [1], Score= 22.03276
+=====================================
+player 1=team 1 : 22.73102
+player 2=team 2 : 16.86725
+player 3=team 3 : 12.89644
+player 4=team 4 : 14.33873
+Winner : team [1], Score= 22.73102
+=====================================
+player 1=team 1 : 14.45434
+player 2=team 2 : 9.60508
+player 3=team 3 : 13.45434
+player 4=team 4 : 15.39051
+Winner : team [4], Score= 15.39051
+=====================================
+player 1=team 1 : 19.78279
+player 2=team 2 : 6.65685
+player 3=team 3 : 9.03527
+player 4=team 4 : 14.60508
+Winner : team [1], Score= 19.78279
+=====================================
+player 1=team 1 : 14.76892
+player 2=team 2 : 17.58846
+player 3=team 3 : 18.64034
+player 4=team 4 : 7.65685
+Winner : team [3], Score= 18.64034
+=====================================
+player 1=team 1 : 21.03276
+player 2=team 2 : 16.58846
+player 3=team 3 : 9.47674
+player 4=team 4 : 4.37841
+Winner : team [1], Score= 21.03276
+=====================================
+player 1=team 1 : 15.76445
+player 2=team 2 : 12.47674
+player 3=team 3 : 17.71267
+player 4=team 4 : 19.78279
+Winner : team [4], Score= 19.78279
+=====================================
+player 1=team 1 : 27.06319
+player 2=team 2 : 7.47674
+player 3=team 3 : 19.53668
+player 4=team 4 : 19.71267
+Winner : team [1], Score= 27.06319
+=====================================
+player 1=team 1 : 19.78279
+player 2=team 2 : 13.03527
+player 3=team 3 : 11.03527
+player 4=team 4 : 7.65685 
+Winner : team [1], Score= 19.78279
+=====================================
+player 1=team 1 : 16.83276
+player 2=team 2 : 14.45434
+player 3=team 3 : 7.0
+player 4=team 4 : 4.0
+Winner : team [1], Score= 16.83276
+=====================================
+player 1=team 1 : 20.03276
+player 2=team 2 : 21.03276
+player 3=team 3 : 13.85516
+player 4=team 4 : 14.80338
+Winner : team [2], Score= 21.03276
+=====================================
+player 1=team 1 : 24.68478
+player 2=team 2 : 14.38604
+player 3=team 3 : 10.32664
+player 4=team 4 : 11.27486
+Winner : team [1], Score= 24.68478
+=====================================
+player 1=team 1 : 15.58846
+player 2=team 2 : 15.45434
+player 3=team 3 : 11.89644
+player 4=team 4 : 16.3619
+Winner : team [4], Score= 16.3619
+=====================================
+player 1=team 1 : 21.03276
+player 2=team 2 : 21.40256
+player 3=team 3 : 18.96687
+player 4=team 4 : 12.03527
+Winner : team [2], Score= 21.40256
+
+win rate: 16/11/2/3
