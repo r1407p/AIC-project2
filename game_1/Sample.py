@@ -178,71 +178,78 @@ def get_target(i, j, l, r, mapStat):
             target_j -= r
             break
     if target_i == i and target_j == j:
-        return None, None
+        assert False
     return target_i, target_j
     
 valid_dir = [(-1,-1,1), (0,-1,2), (1,-1,3), (-1,0,4), (1,0,6), (-1,1,7), (0,1,8), (1,1,9)]    
 def deparate(m):
-    if m == 2:
-        return [1]
-    if m == 3:
-        return [1, 2]
-    if m == 4:
-        return [1,2, 3]
-    if m == 5:
-        return [2, 3]
-    if m == 6:
-        return [2, 3, 4]
-    if m == 7:
-        return [3, 4]
-    if m == 8:
-        return [4, 2, 6]
-    if m == 9:
-        return [4, 2, 7]
-    if m == 10:
-        return [5, 3, 7]
-    if m == 11:
-        return [6, 4, 8]
-    if m == 12:
-        return [6, 4,  8]
-    if m == 13:
-        return [6, 4, 9]
-    if m == 14:
-        return [7, 3, 10]
-    if m == 15:
-        return [7, 3, 11]
-    if m == 16:
-        return [8, 4,  12]
+    m_ = [
+        [],
+        [],
+        [1], #2
+        [1, 2], #3
+        [2, 3], #4
+        [3, 2], #5
+        [3, 2, 4], #6
+        [3, 4], #7
+        [4, 2, 6], #8
+        [4, 2, 7], #9
+        [5, 3, 7], #10
+        [6, 4, 8], #11
+        [6, 4,  8], #12
+        [6, 4, 9], #13
+        [7, 3, 10], #14
+        [7, 3, 11], #15
+        [8, 4,  12] #16
+    ]
+    if 2<= m <= 16:
+        return m_[m]
+    else:
+        return []
+class Action:
+    def __init__(self, i, j, m, target_i, target_j, dir, new_m):
+        self.ori_i = i  
+        self.ori_j = j
+        self.ori_m = m
+        self.target_i = target_i
+        self.target_j = target_j
+        self.dir = dir
+        self.new_m = new_m
+    def __str__(self) -> str:
+        return f"Current Position: ({self.ori_i}, {self.ori_j}), Remaining Sheep: {self.ori_m - self.new_m}, Target Position: ({self.next_i}, {self.next_j}), Direction: {self.dir}, New Sheep: {self.new_m}"
     
-def get_possible_move(playerID, mapStat, sheepStat):    
-    current_pos = []
+def get_possible_action(playerID, mapStat, sheepStat):
+    movable_pos = []
     for i in range(12):
         for j in range(12):
             if mapStat[i][j] == playerID and sheepStat[i][j] > 1:
-                current_pos.append(Movement(playerID, i, j, int(sheepStat[i][j]), mapStat, sheepStat))
-                
-    # get all possible move without number of sheep
-    move = []
-    for pos in current_pos:
+                movable_pos.append((i, j, int(sheepStat[i][j])))
+    movable_pos_dir = []
+    for i, j, m in movable_pos:
         for l, r, dir in valid_dir:
-            target_i, target_j = get_target(pos.i, pos.j, l, r, mapStat)
-            if target_i is None:
-                continue
-            new_pos = deepcopy(pos)
-            new_pos.set_next(target_i, target_j, dir)
-            move.append(new_pos)
-    # get all possible move with number of sheep
+            next_i, next_j = i+l, j+r
+            if 0 <= next_i < 12 and 0 <= next_j < 12 and mapStat[next_i][next_j] == 0:
+                movable_pos_dir.append((i, j, m, l, r, dir))
+    all_possible_action = []
+    for i, j, m, l, r, dir in movable_pos_dir:
+        target_i, target_j = get_target(i, j, l, r, mapStat)
+        for remain in deparate(m):
+            all_possible_action.append(Action(i, j, m-remain, target_i, target_j, dir, remain))
+    
+    return all_possible_action
+    
+def get_possible_move(playerID, mapStat, sheepStat):
     all_possible_move = []
-    for pos in move:
-        for remain in deparate(pos.m):
-            new_pos = deepcopy(pos)
-            new_pos.m -= remain 
-            new_pos.target_m = remain
-            all_possible_move.append(deepcopy(new_pos))
-        # new_pos.m -= remain 
-        # new_pos.target_m = remain
-        # all_possible_move.append(new_pos)
-    return all_possible_move
+    actions = get_possible_action(playerID, mapStat, sheepStat)
+    for action in actions:
+        
+        new_mapStat = deepcopy(mapStat)
+        new_sheepStat = deepcopy(sheepStat)
+        new_move = Movement(playerID, action.ori_i, action.ori_j, action.ori_m, new_mapStat, new_sheepStat)
+        new_move.set_next(action.target_i, action.target_j, action.dir)
+        new_move.target_m = action.new_m
+        all_possible_move.append(new_move)
+    return all_possible_move    
 
 def calculate_score(mapStat, sheepStat, playerID):
     # Initialize a dictionary to store the size of each connected region for the player
@@ -277,7 +284,7 @@ def calculate_score(mapStat, sheepStat, playerID):
                 connected_regions[(i, j)] = region_size
     
     # Calculate the score based on the size of each connected region raised to the power of 1.25
-    score = sum(region_size ** 2.5 for region_size in connected_regions.values())
+    score = sum(region_size ** 1.25 for region_size in connected_regions.values())
     
     # Round the score to the nearest integer
     rounded_score = score
@@ -318,9 +325,11 @@ def GetStep(playerID, mapStat, sheepStat):
         current_mapStat, current_sheepStat = pos.get_next_state()
         score.append((calculate_score(current_mapStat, current_sheepStat, playerID), pos.res_i, pos.res_j, pos.res_dir, pos.res_m))
     score.sort(reverse=True)
-    # for _ in score:
-    #     print(_)
-    # pprint(score)
+    # if len(score) < 20:
+    #     for i in range(3):
+    #         print(tree[i])
+    #     for _ in score:
+    #         print(_)
     # return the best move
     step[0] = (score[0][1], score[0][2])
     step[1] = score[0][4]
