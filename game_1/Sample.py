@@ -12,27 +12,6 @@ import time
     init_pos=[x,y],代表起始位置
     
 '''
-def is_valid(x, y, mapStat):
-    if mapStat[x][y] != 0:
-        return False
-    for (l,r) in (-1, 0), (1, 0), (0, -1), (0, 1):
-        if  mapStat[x+l][y+r] == -1 or x+l < 0 or x+l >= 12 or y+r < 0 or y+r >= 12:
-            return True
-
-
-def generate(x, y):
-    res = []
-    for i in range(x, y+1):
-        res.append((i, x))
-        res.append((i, y))
-        res.append((x, i))
-        res.append((y, i))
-    return res
-# def generate(mapStat, x, y):
-#     mapStat[x][y] = 1
-#     sheepStat = deepcopy(mapStat)
-#     sheepStat[x][y] = 16
-#     return mapStat, sheepStat
 def get_possible_init_pos(mapStat):
     h, w = mapStat.shape
     possible_pos = []
@@ -281,11 +260,22 @@ def calculate_score(mapStat, sheepStat, playerID):
                         if 0 <= nx < 12 and 0 <= ny < 12 and mapStat[nx][ny] == playerID:
                             stack.append((nx, ny))
                 # Store the size of the connected region
-                connected_regions[(i, j)] = region_size
-    
+                connected_regions[(i, j)] = region_size            
     # Calculate the score based on the size of each connected region raised to the power of 1.25
     score = sum(region_size ** 1.25 for region_size in connected_regions.values())
-    
+    for i  in range(12):
+        for j in range(12):
+            live = 0
+            if mapStat[i][j] == playerID and sheepStat[i][j] > 1:
+                for l in range(-1, 2, 1):
+                    for r in range(-1, 2, 1):
+                        if l == 0 and r == 0:
+                            continue
+                        next_i = i + l
+                        next_j = j + r
+                        if 0 <= next_i < 12 and 0 <= next_j < 12 and mapStat[next_i][next_j] == 0:
+                            live += 1
+                score -= sheepStat[i][j]**1.25 * (0.5 ** live)
     # Round the score to the nearest integer
     rounded_score = score
     
@@ -307,8 +297,11 @@ def GetStep(playerID, mapStat, sheepStat):
         for pos in tree[current_layer-1]:
             current_mapStat, current_sheepStat = pos.get_next_state()
             new_moves = get_possible_move(playerID, current_mapStat, current_sheepStat)
+            new_moves = random.sample(new_moves, int(len(new_moves) * 0.8))
             if len(new_moves) == 0:
                 tree[current_layer].append(pos)
+                continue
+            # new_moves = random.sample(new_moves, int(len(new_moves) * 0.7))
             for new_pos in new_moves:
                 new_pos.set_res(pos.res_i, pos.res_j, pos.res_dir, pos.res_m)
                 tree[current_layer].append(new_pos)
@@ -334,41 +327,7 @@ def GetStep(playerID, mapStat, sheepStat):
     step[0] = (score[0][1], score[0][2])
     step[1] = score[0][4]
     step[2] = score[0][3]
-    # pprint(step)
     return step
-    # score = {}
-    # count = {}
-    # for pos in tree[current_layer]:
-    #         current_mapStat, current_sheepStat = pos.get_next_state()
-    #         score_ = calculate_score(current_mapStat, current_sheepStat, playerID)
-    #         # print(score_)
-    #         hash_value = int(pos.res_i * 1000000 + pos.res_j * 10000 + pos.res_dir * 100 + pos.res_m)
-    #         score[hash_value] = score.get(hash_value, 0) + score_
-    #         count[hash_value] = count.get(hash_value, 0) + 1
-    #     max_score = 0
-    #     max_key = 0
-    #     for key, value in score.items():
-    #         print(key, value, count[key], value/count[key])
-    #         if value/count[key] > max_score:
-    #             max_score = value
-    #             max_key = key
-    #     res_m = max_key % 100
-    #     max_key //= 100
-    #     res_dir = max_key % 100
-    #     max_key //= 100
-    #     res_j = max_key % 100
-    #     max_key //= 100
-    #     res_i = max_key % 100
-    #     step[0] = (res_i, res_j)
-    #     step[1] = res_m
-    #     step[2] = res_dir
-    #     return step
-    '''
-    Write your code here
-    
-    '''
-    return step
-
 
 # player initial
 (id_package, playerID, mapStat) = STcpClient.GetMap()

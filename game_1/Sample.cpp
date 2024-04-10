@@ -15,30 +15,6 @@
     init_pos=<x,y>,代表你要選擇的起始位置
     
 */
-bool is_valid(int x, int y, std::vector<std::vector<int>>& mapStat) {
-    if (mapStat[x][y] != 0) {
-        return false;
-    }
-    int offsets[4][2] = { {-1, 0}, {1, 0}, {0, -1}, {0, 1} };
-    for (int i = 0; i < 4; ++i) {
-        int l = offsets[i][0];
-        int r = offsets[i][1];
-        if (x + l < 0 || x + l >= 12 || y + r < 0 || y + r >= 12 || mapStat[x + l][y + r] == -1) {
-            return true;
-        }
-    }
-    return false;
-}
-std::vector<std::pair<int, int>> generate(int x, int y) {
-    std::vector<std::pair<int, int>> res;
-    for (int i = x; i <= y; ++i) {
-        res.push_back(std::make_pair(i, x));
-        res.push_back(std::make_pair(i, y));
-        res.push_back(std::make_pair(x, i));
-        res.push_back(std::make_pair(y, i));
-    }
-    return res;
-}
 #include <vector>
 #include <iostream>
 
