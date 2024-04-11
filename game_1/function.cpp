@@ -77,10 +77,10 @@ vector<int> get_players(int **mapStat,int mapsize){
     return players;
 }
 
-bool is_terminal(int **mapStat,int **sheepStat, int mapsize){
+bool is_terminal(int **mapStat,int **sheepStat, int mapsize, vector<int> players){
     
-    for(int player = 1 ;player <=4; player++){
-        auto actions = get_actions(player, mapStat, sheepStat, mapsize);
+    for(int i = 0; i < 4; i++){
+        auto actions = get_actions(players[i], mapStat, sheepStat, mapsize);
         if (actions.size() > 0) {
             return false;
         }
@@ -166,12 +166,12 @@ void apply_action(int **mapStat, int **sheepStat, vector<int> action, int player
     // cout << playerID <<endl;
     // for(int i = 0; i < mapSize; i++){
     //     for(int j = 0; j < mapSize; j++){
-    //         cout << setw(4) << mapStat[i][j] <<" ";
+    //         cout << setw(2) << mapStat[i][j] <<" ";
     //     }cout << "\n";
     // }
     // for(int i = 0; i < mapSize; i++){
     //     for(int j = 0; j < mapSize; j++){
-    //         cout << setw(4) << sheepStat[i][j] <<" ";
+    //         cout << setw(2) << sheepStat[i][j] <<" ";
     //     }cout << "\n";
     // }
 }
