@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include "function.cpp"
 #include <thread>
-
+#include <iomanip>
 #include <chrono>
 #include <ctime>
 using namespace std;
@@ -64,7 +64,7 @@ public:
         this->simulation();
     }
     void simulation(){
-        int simulation_num = 10000;
+        int simulation_num = 40000;
         auto start = chrono::system_clock::now();
         while( simulation_num-- && chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now()-start) < time_threshold){
             // cout << "simulation_num: "<< simulation_num <<"\n";
@@ -74,6 +74,7 @@ public:
             delete_map(new_mapStat, 12);
             delete_map(new_sheepStat, 12);
         }
+        cout <<40000- simulation_num <<"\n";
     }
     void select(MCTS_Node *current_node, int **mapStat, int **sheepStat){
         // cout << "select" << child->children.size() <<"\n";
@@ -207,12 +208,12 @@ std::vector<int> GetStep(int playerID, int mapStat[12][12], int sheepStat[12][12
     step = mcts.get_step();
     for (int i = 0; i < 12; i++){
         for (int j = 0; j < 12; j++){
-            cout << mapStat[i][j] <<" ";
+            cout<<setw(2) << mapStat[i][j] <<" ";
         }cout << "\n";
     }
     for (int i = 0; i < 12; i++){
         for (int j = 0; j < 12; j++){
-            cout << sheepStat[i][j] <<" ";
+            cout<<setw(2) << sheepStat[i][j] <<" ";
         }cout << "\n";
     }
     return step;
