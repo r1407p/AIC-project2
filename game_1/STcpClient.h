@@ -7,6 +7,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <sys/types.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define MSG_WAITALL     0x8
 #pragma comment(lib, "Ws2_32.lib")
 #include <fcntl.h>
 #include <cstdio>
