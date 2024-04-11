@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include "function.cpp"
 #include <thread>
-
+#include <iomanip>
 #include <chrono>
 #include <ctime>
 using namespace std;
@@ -257,12 +257,12 @@ std::vector<int> GetStep(int playerID, int mapStat[12][12], int sheepStat[12][12
     step = mcts.get_step();
     for (int i = 0; i < 12; i++){
         for (int j = 0; j < 12; j++){
-            cout << mapStat[i][j] <<" ";
+            cout<<setw(2) << mapStat[i][j] <<" ";
         }cout << "\n";
     }
     for (int i = 0; i < 12; i++){
         for (int j = 0; j < 12; j++){
-            cout << sheepStat[i][j] <<" ";
+            cout<<setw(2) << sheepStat[i][j] <<" ";
         }cout << "\n";
     }
     return step;

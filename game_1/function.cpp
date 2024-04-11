@@ -121,21 +121,21 @@ double cal_score(int playerID, int **mapStat, int **sheepStat, int mapSize){
         }
     }
     // penalty
-    // for (int i = 0; i < mapSize; i++) {
-    //     for(int j = 0; j < mapSize; j++){
-    //         if(mapStat[i][j] == playerID && sheepStat[i][j] > 1){
-    //             int live = 0;
-    //             for (int k =0; k <8 ; k++){
-    //                 int x = i + VALID_DIR[k][0];
-    //                 int y = j + VALID_DIR[k][1];
-    //                 if(0 <= x && x < mapSize && 0 <= y && y < mapSize && mapStat[x][y] == 0){
-    //                     live += 1;
-    //                 }
-    //             }
-    //             res -= pow(sheepStat[i][j], 1.25) * pow(0.5, live);
-    //         }
-    //     }
-    // }
+    for (int i = 0; i < mapSize; i++) {
+        for(int j = 0; j < mapSize; j++){
+            if(mapStat[i][j] == playerID && sheepStat[i][j] > 1){
+                int live = 0;
+                for (int k =0; k <8 ; k++){
+                    int x = i + VALID_DIR[k][0];
+                    int y = j + VALID_DIR[k][1];
+                    if(0 <= x && x < mapSize && 0 <= y && y < mapSize && mapStat[x][y] == 0){
+                        live += 1;
+                    }
+                }
+                res -= pow(sheepStat[i][j], 1.25) * pow(0.5, live);
+            }
+        }
+    }
     return res;
 }
 void init_map(int **mapStat, int **sheepStat, vector<int> init_pos, int playerID, int sheepNum){
