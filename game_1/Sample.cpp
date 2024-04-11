@@ -18,7 +18,8 @@ using namespace std;
 
 auto time_threshold = chrono::milliseconds(2650);
 double c = 1.414;
-int MAX_SIMULATION = 400;
+int MAX_SIMULATION = 400000;
+int total_simulation = 0;
 
 class MCTS_Node {
 public:
@@ -81,8 +82,8 @@ public:
         int simulation_times = 40000;
         auto start = std::chrono::system_clock::now();
         std::vector<HANDLE> threads; // Windows thread handle
-        std::vector<ThreadResult> results; // Vector to hold thread results
         vector<ThreadParams> params;
+        total_simulation = 0;
         for (int t = 0; t < num_threads; t++) {
             ThreadParams param = {this, start, t};
             params.push_back(param);
@@ -94,20 +95,21 @@ public:
         for (HANDLE thread : threads) {
             CloseHandle(thread); // Close thread handles
         }
-        results.clear();
+        cout << "Total simulation: " << total_simulation << "\n";
+        params.clear();
+        threads.clear();
         return;
     }
     static DWORD WINAPI threadFunction(LPVOID lpParam) {
         auto* params = static_cast<ThreadParams*>(lpParam);
         auto start = params->start; // Get start time from parameters
         int t = params->t; // Get thread index from parameters
-        cout << "Thread" << t << "start\n";
         auto thread_start = start; // Dereference the pointer to get the start time
         int simulation_cnt = MAX_SIMULATION; // Example simulation times
         auto root = params->mcts->roots[t]; // Get the root node from parameters
 
         // Initiate different random seed
-        srand(static_cast<unsigned int>(time(NULL)) + t);
+        srand(static_cast<unsigned int>(time(NULL))*t);
 
         while (simulation_cnt-- && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - thread_start) < time_threshold) {
             int **new_mapStat = copy_map(params->mcts->ori_mapStat, 12);
@@ -120,7 +122,8 @@ public:
         ThreadResult result;
         result.id = t;
         result.simulation_cnt = simulation_cnt;
-        cout << "Thread " << t << " finished with " << simulation_cnt << " simulations\n";
+        total_simulation += MAX_SIMULATION - simulation_cnt;
+        // cout << "Thread " << t << " finished with " << MAX_SIMULATION - simulation_cnt << " simulations\n";
         return reinterpret_cast<DWORD_PTR>(&result);
     }
     void select(MCTS_Node *current_node, int **mapStat, int **sheepStat, int thread_id){

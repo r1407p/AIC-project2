@@ -1,5 +1,5 @@
 1
-./Sample_thread2.exe
+./Sample_thread5.exe
 2
 ./sample/Sample_2.exe
 3
