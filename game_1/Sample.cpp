@@ -16,7 +16,7 @@ using namespace std;
 
 #define _WIN32_WINNT 0x0600
 
-auto time_threshold = chrono::milliseconds(1500);
+auto time_threshold = chrono::milliseconds(2650);
 double c = 1.414;
 
 
@@ -29,7 +29,7 @@ public:
     float value;
     int visit;
     float policy;
-    MCTS_Node(MCTS_Node* parent = nullptr, vector<int> step = {}, int playerID = -1) {
+    MCTS_Node(MCTS_Node* parent = nullptr, vector<int> step = {}, int playerID = 0) {
         this->parent = parent;
         this->step = step;
         this->playerID = playerID;
@@ -37,117 +37,103 @@ public:
         this->visit = 0;
         this->policy = 0;
     }    
-    MCTS_Node(const MCTS_Node& other) {
-        this->parent = other.parent;
-        this->children = other.children;
-        this->step = other.step;
-        this->playerID = other.playerID;
-        this->value = other.value;
-        this->visit = other.visit;
-        this->policy = other.policy;
-        cout << "copy\n";
-        cout << other.playerID<<" "<< this->playerID <<"\n";
-    }
+    // MCTS_Node(const MCTS_Node& other) {
+    //     this->parent = other.parent;
+    //     this->children = other.children;
+    //     this->step = other.step;
+    //     this->playerID = other.playerID;
+    //     this->value = other.value;
+    //     this->visit = other.visit;
+    //     this->policy = other.policy;
+    //     cout << "copy\n";
+    //     cout << other.playerID<<" "<< this->playerID <<"\n";
+    // }
 };
 class MCTS{
 public:
-    int playerID;
-    int **mapStat;
-    int **sheepStat;
+    int ori_playerID;
+    int **ori_mapStat;
+    int **ori_sheepStat;
     MCTS_Node *root;
 
     MCTS(int playerID, int **mapStat, int **sheepStat){
-        this->playerID = playerID;
-        this->mapStat = mapStat;
-        this->sheepStat = sheepStat;
-        root = new MCTS_Node(nullptr, {}, playerID);
+        this->ori_playerID = playerID;
+        this->ori_mapStat = mapStat;
+        this->ori_sheepStat = sheepStat;
+        root = new MCTS_Node();
         this->simulation();
     }
     void simulation(){
-        int simulation_num = 200;
+        int simulation_num = 10000;
         auto start = chrono::system_clock::now();
         while( simulation_num-- && chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now()-start) < time_threshold){
             // cout << "simulation_num: "<< simulation_num <<"\n";
-            int **new_mapStat = copy_map(mapStat, 12);
-            int **new_sheepStat = copy_map(sheepStat, 12);
+            int **new_mapStat = copy_map(ori_mapStat, 12);
+            int **new_sheepStat = copy_map(ori_sheepStat, 12);
             this->select(root, new_mapStat, new_sheepStat);
+            delete_map(new_mapStat, 12);
+            delete_map(new_sheepStat, 12);
         }
     }
-    void select(MCTS_Node *child, int **mapStat, int **sheepStat){
+    void select(MCTS_Node *current_node, int **mapStat, int **sheepStat){
         // cout << "select" << child->children.size() <<"\n";
-        while (child->children.size() > 0){
+        while (current_node->children.size() > 0){
             // cout << "step\n";
-            child->visit += 1;
-            double best_score = -100000;
+            current_node->visit += 1;
+            double best_score = -10000000;
             MCTS_Node *best_child = nullptr;
-            for (int i = 0; i < child->children.size(); i++){
-                MCTS_Node *tmp = child->children[i];
+            
+            for (int i = 0; i < current_node->children.size(); i++){
+                MCTS_Node *tmp = current_node->children[i];
+                double score;
                 if (tmp->visit == 0){
-                    best_child = tmp;
-                    break;
+                    score = 10000000;
                 }else{
-                    double score = tmp->value / tmp->visit + c * sqrt(log(child->visit) / tmp->visit);
-                    if (score > best_score){
-                        best_score = score;
-                        best_child = tmp;
-                    }
+                    score = tmp->value / tmp->visit + c * sqrt(log(root->visit) / tmp->visit);
+                }
+                if (score > best_score){
+                    best_score = score;
+                    best_child = tmp;
                 }
             }
             if (best_child != nullptr){
-                child = best_child;
-                apply_action(mapStat, sheepStat, child->step, playerID, 12);
+                current_node = best_child;
+                apply_action(mapStat, sheepStat, current_node->step, current_node->playerID, 12);
             }
         }
-        child->visit += 1;
+        
+        current_node->visit += 1;
         if (is_terminal(mapStat, sheepStat, 12)){
-            this->update(child, mapStat, sheepStat);
+            this->update(current_node, mapStat, sheepStat);
             return;
         }
-        // cout << root->playerID <<"\n";
-        // cout << child->playerID <<"\n";
-        // cout << "get_actions" << child->playerID %4 + 1 <<"\n";
-        vector<vector<int>> actions = get_actions(child->playerID , mapStat, sheepStat, 12);
-        // cout << "actions size: "<< actions.size() <<"\n";
-        for (auto action : actions){
-            MCTS_Node *new_child = new MCTS_Node(child, action, child->playerID %4 + 1);
-            child->children.push_back(new_child);
+        vector<vector<int>> actions = get_actions(current_node->playerID%4+1 , mapStat, sheepStat, 12);
+        for(auto action:actions){
+            MCTS_Node *new_node = new MCTS_Node(current_node, action, current_node->playerID%4+1);
+            current_node->children.push_back(new_node);
         }
-        this->evaluate(child, mapStat, sheepStat);
+        this->evaluate(current_node, mapStat, sheepStat);
+        
     }
-    void evaluate(MCTS_Node * child, int **mapStat, int **sheepStat){
+    void evaluate(MCTS_Node * current_node, int **mapStat, int **sheepStat){
         // cout << "evaluate\n";
-        if (child->children.size() > 0){
-            int random_child_index = rand() % child->children.size();
-            child = child->children[random_child_index];
-            apply_action(mapStat, sheepStat, child->step, child->playerID, 12);
+        if (current_node->children.size() > 0){
+            int random_child_index = rand() % current_node->children.size();
+            current_node = current_node->children[random_child_index];
+            apply_action(mapStat, sheepStat, current_node->step, current_node->playerID, 12);
         }
-        int player = child->playerID;
+        int player = current_node->playerID;
         while(!is_terminal(mapStat, sheepStat, 12)){
             player = player % 4 + 1;
-            // for(int i = 0 ;i < 12 ;i++){
-            //     for(int j = 0; j < 12; j++){
-            //         cout << mapStat[i][j] <<" ";
-            //     }cout << "\n";
-            // }
-            // for(int i = 0 ;i < 12 ;i++){
-            //     for(int j = 0; j < 12; j++){
-            //         cout << sheepStat[i][j] <<" ";
-            //     }cout << "\n";
-            // }
             vector<vector<int>> actions = get_actions(player, mapStat, sheepStat, 12);
-            // cout << actions.size()<<endl;
             if (actions.size() == 0){
                 continue;
             }
             int random_action_index = rand() % actions.size();
             vector<int> action = actions[random_action_index];
-            // cout << "apply_action\n";
-            // for(auto a : action){
-            //     cout << a <<" ";
-            // }cout << "\n";
-            apply_action(mapStat, sheepStat, action, playerID, 12);
+            apply_action(mapStat, sheepStat, action, player, 12);
         }
-        this->update(child, mapStat, sheepStat);
+        this->update(current_node, mapStat, sheepStat);
     }
     void update(MCTS_Node *child, int ** mapStat, int **sheepStat){
         while(child->parent != nullptr){
@@ -164,9 +150,14 @@ public:
                 mp[step] += this->root->children[i]->value / this->root->children[i]->visit; 
             }
         }
-        vector<int> step = max_element(mp.begin(), mp.end(), [](const pair<vector<int>, double> &a, const pair<vector<int>, double> &b){
-            return a.second < b.second;
-        })->first;
+        vector<int> step;
+        double max_score = -100000000;
+        for (auto it = mp.begin(); it != mp.end(); it++){
+            if (it->second > max_score){
+                max_score = it->second;
+                step = it->first;
+            }
+        }
         return step;
     }
 };

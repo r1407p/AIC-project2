@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <thread>
 #include <chrono>
+#include <iomanip>
 #include <ctime>
 using namespace std;
 vector<vector<int>> NEAR_{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -159,6 +160,20 @@ void apply_action(int **mapStat, int **sheepStat, vector<int> action, int player
     }
     mapStat[x][y] = playerID;
     sheepStat[x][y] = m;
+    // for(auto a: action ){
+    //     cout << a << " ";
+    // }cout  << endl;
+    // cout << playerID <<endl;
+    // for(int i = 0; i < mapSize; i++){
+    //     for(int j = 0; j < mapSize; j++){
+    //         cout << setw(4) << mapStat[i][j] <<" ";
+    //     }cout << "\n";
+    // }
+    // for(int i = 0; i < mapSize; i++){
+    //     for(int j = 0; j < mapSize; j++){
+    //         cout << setw(4) << sheepStat[i][j] <<" ";
+    //     }cout << "\n";
+    // }
 }
 int **copy_map(int **map, int mapSize){
     int **new_map = new int*[mapSize];
@@ -180,3 +195,9 @@ int** convertMapStat(int mapStat[12][12]) {
         }
         return convertedMapStat;
     }
+void delete_map(int **map, int mapSize){
+    for(int i = 0; i < mapSize; i++){
+        delete[] map[i];
+    }
+    delete[] map;
+}
