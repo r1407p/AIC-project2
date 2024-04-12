@@ -18,6 +18,7 @@ using namespace std;
 
 auto time_threshold = chrono::milliseconds(2200);
 double c = 1.414;
+const int map_size = 12;
 const int thread_num = 4;
 
 
@@ -95,11 +96,11 @@ public:
         auto start = chrono::system_clock::now();
         while( simulation_num-- && chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now()-start) < time_threshold){
             // cout << "simulation_num: "<< simulation_num <<"\n";
-            int **new_mapStat = copy_map(ori_mapStat, 12);
-            int **new_sheepStat = copy_map(ori_sheepStat, 12);
+            int **new_mapStat = copy_map(ori_mapStat, map_size);
+            int **new_sheepStat = copy_map(ori_sheepStat, map_size);
             this->select(root, root, new_mapStat, new_sheepStat);
-            delete_map(new_mapStat, 12);
-            delete_map(new_sheepStat, 12);
+            delete_map(new_mapStat, map_size);
+            delete_map(new_sheepStat, map_size);
         }
         string s = "simulation_num: " + to_string(40000- simulation_num) + "\n"; 
         cout << s ;
@@ -127,16 +128,16 @@ public:
             }
             if (best_child != nullptr){
                 current_node = best_child;
-                apply_action(mapStat, sheepStat, current_node->step, players[current_node->player_idx], 12);
+                apply_action(mapStat, sheepStat, current_node->step, players[current_node->player_idx], map_size);
             }
         }
         
         current_node->visit += 1;
-        if (is_terminal(mapStat, sheepStat, 12, players)){
+        if (is_terminal(mapStat, sheepStat, map_size, players)){
             this->update(root, current_node, mapStat, sheepStat);
             return;
         }
-        vector<vector<int>> actions = get_actions(players[(current_node->player_idx+1)%4] , mapStat, sheepStat, 12);
+        vector<vector<int>> actions = get_actions(players[(current_node->player_idx+1)%4] , mapStat, sheepStat, map_size);
         for(auto action:actions){
             MCTS_Node *new_node = new MCTS_Node(current_node, action, (current_node->player_idx+1)%4);
             current_node->children.push_back(new_node);
@@ -149,26 +150,26 @@ public:
         if (current_node->children.size() > 0){
             int random_child_index = rand() % current_node->children.size();
             current_node = current_node->children[random_child_index];
-            apply_action(mapStat, sheepStat, current_node->step, players[current_node->player_idx], 12);
+            apply_action(mapStat, sheepStat, current_node->step, players[current_node->player_idx], map_size);
         }
         int player_idx = current_node->player_idx;
-        while(!is_terminal(mapStat, sheepStat, 12, players)){
+        while(!is_terminal(mapStat, sheepStat, map_size, players)){
             // player = player % 4 + 1;
             player_idx = (player_idx + 1) % 4;
-            vector<vector<int>> actions = get_actions(players[player_idx], mapStat, sheepStat, 12);
+            vector<vector<int>> actions = get_actions(players[player_idx], mapStat, sheepStat, map_size);
             if (actions.size() == 0){
                 continue;
             }
             int random_action_index = rand() % actions.size();
             vector<int> action = actions[random_action_index];
-            apply_action(mapStat, sheepStat, action, players[player_idx], 12);
+            apply_action(mapStat, sheepStat, action, players[player_idx], map_size);
         }
         this->update(root, current_node, mapStat, sheepStat);
     }
     void update(MCTS_Node* root, MCTS_Node *child, int ** mapStat, int **sheepStat){
         while(child->parent != nullptr){
             child->policy = child->visit / root->visit;
-            child->value += cal_score(players[child->player_idx], mapStat, sheepStat, 12);
+            child->value += cal_score(players[child->player_idx], mapStat, sheepStat, map_size);
             child = child->parent;
         }
     }
@@ -204,10 +205,10 @@ public:
 */
 std::vector<int> InitPos(int mapStat[12][12], int playerID) {
     int ** convert_map_state = convertMapStat(mapStat);
-    int ** sheepStat = new int*[12];
-    for(int i = 0; i < 12; i++){
-        sheepStat[i] = new int[12];
-        for(int j = 0; j < 12; j++){
+    int ** sheepStat = new int*[map_size];
+    for(int i = 0; i < map_size; i++){
+        sheepStat[i] = new int[map_size];
+        for(int j = 0; j < map_size; j++){
             sheepStat[i][j] = 0;
         }
     }
@@ -254,13 +255,13 @@ std::vector<int> GetStep(int playerID, int mapStat[12][12], int sheepStat[12][12
     }
     auto mcts = MCTS(playerID, convertMapStat(mapStat), convertMapStat(sheepStat), players);
     step = mcts.get_step();
-    for (int i = 0; i < 12; i++){
-        for (int j = 0; j < 12; j++){
+    for (int i = 0; i < map_size; i++){
+        for (int j = 0; j < map_size; j++){
             cout<<setw(2) << mapStat[i][j] <<" ";
         }cout << "\n";
     }
-    for (int i = 0; i < 12; i++){
-        for (int j = 0; j < 12; j++){
+    for (int i = 0; i < map_size; i++){
+        for (int j = 0; j < map_size; j++){
             cout<<setw(2) << sheepStat[i][j] <<" ";
         }cout << "\n";
     }
