@@ -3,10 +3,12 @@
 //
 #pragma once
 
+#include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <sys/types.h>
 #pragma comment(lib, "Ws2_32.lib")
-
+#include <fcntl.h>
 #include <cstdio>
 #include <vector>
 
@@ -15,7 +17,7 @@ const char *infoServer[] = {"localhost", "8887"};
 /*
 	請將 idTeam 改成組別
 */
-int idTeam = 1;
+int idTeam = 67;
 
 class _WSAData
 {
