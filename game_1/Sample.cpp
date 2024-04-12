@@ -16,7 +16,7 @@ using namespace std;
 
 #define _WIN32_WINNT 0x0600
 
-auto time_threshold = chrono::milliseconds(2200);
+auto time_threshold = chrono::milliseconds(2500);
 double c = 1.414;
 const int map_size = 12;
 const int thread_num = 4;
@@ -92,7 +92,7 @@ public:
     void simulation(){
         auto root = new MCTS_Node();
         this->roots.push_back(root);
-        int simulation_num = 40000;
+        int simulation_num = 1000000;
         auto start = chrono::system_clock::now();
         while( simulation_num-- && chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now()-start) < time_threshold){
             // cout << "simulation_num: "<< simulation_num <<"\n";
@@ -102,7 +102,7 @@ public:
             delete_map(new_mapStat, map_size);
             delete_map(new_sheepStat, map_size);
         }
-        string s = "simulation_num: " + to_string(40000- simulation_num) + "\n"; 
+        string s = "simulation_num: " + to_string(1000000- simulation_num) + "\n"; 
         cout << s ;
     }
     void select(MCTS_Node* root, MCTS_Node *current_node, int **mapStat, int **sheepStat){
