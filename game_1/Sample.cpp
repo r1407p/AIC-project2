@@ -18,7 +18,7 @@ using namespace std;
 
 auto time_threshold = chrono::milliseconds(2200);
 double c = 1.414;
-const int thread_num = 1;
+const int thread_num = 4;
 
 
 class MCTS_Node {
@@ -211,18 +211,13 @@ std::vector<int> InitPos(int mapStat[12][12], int playerID) {
             sheepStat[i][j] = 0;
         }
     }
-    vector<int> players = {playerID};
-    for(int i = 0; i < 12; i++){
-        for(int j = 0; j < 12; j++){
-            if (mapStat[i][j] > 0){
-                if (find(players.begin(), players.end(), mapStat[i][j]) == players.end()){
-                    players.push_back(mapStat[i][j]);
-                }
-            }
+    vector<int> players;
+    for(int i = 0 ; i < 4; i++){
+        int current_player = (playerID+i)%4;
+        if (current_player == 0){
+            current_player = 4;
         }
-    }
-    for(int i = players.size(); i < 4;i++){
-        players.push_back(10+i);
+        players.push_back(current_player);
     }
     auto mcts = MCTS(playerID, convert_map_state, sheepStat, players);
     return mcts.get_step();
@@ -249,15 +244,13 @@ std::vector<int> InitPos(int mapStat[12][12], int playerID) {
 
 std::vector<int> GetStep(int playerID, int mapStat[12][12], int sheepStat[12][12]) {
     std::vector<int> step(4, 0);
-    vector<int> players = {playerID};
-    for(int i = 0; i < 12; i++){
-        for(int j = 0; j < 12; j++){
-            if (mapStat[i][j] > 0){
-                if (find(players.begin(), players.end(), mapStat[i][j]) == players.end()){
-                    players.push_back(mapStat[i][j]);
-                }
-            }
+    vector<int> players;
+    for(int i = 0 ; i < 4; i++){
+        int current_player = (playerID+i)%4;
+        if (current_player == 0){
+            current_player = 4;
         }
+        players.push_back(current_player);
     }
     auto mcts = MCTS(playerID, convertMapStat(mapStat), convertMapStat(sheepStat), players);
     step = mcts.get_step();
