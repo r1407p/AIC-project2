@@ -3,10 +3,12 @@
 //
 #pragma once
 
+#include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <sys/types.h>
 #pragma comment(lib, "Ws2_32.lib")
-
+#include <fcntl.h>
 #include <cstdio>
 #include <vector>
 
@@ -15,7 +17,7 @@ const char *infoServer[] = {"localhost", "8887"};
 /*
 	請將 idTeam 改成組別
 */
-int idTeam = 1;
+int idTeam = 67;
 
 class _WSAData
 {
@@ -269,6 +271,7 @@ void SendInitPos(int id_package, std::vector<int> &pos)
 	向 server 傳達移動訊息
     id_package : 想要回復的訊息的 id_package
     Step = <x, y, m, dir>
+    x, y 表示要進行動作的座標 
             x, y 表示要進行動作的座標 
             m = 要切割成第二群的羊群數量
             dir = 移動方向(1~9),對應方向如下圖所示
