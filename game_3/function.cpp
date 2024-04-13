@@ -171,7 +171,7 @@ void apply_action(int **mapStat, int **sheepStat, vector<int> action, int player
     sheepStat[x][y] -= m;
     int dx = action_map[dir][0];
     int dy = action_map[dir][1];
-    while(0 < x+dx && x+dx < mapSize && 0 < y+dy && y+dy < mapSize && mapStat[x+dx][y+dy] == 0 ){
+    while(0 <= x+dx && x+dx < mapSize && 0 <= y+dy && y+dy < mapSize && mapStat[x+dx][y+dy] == 0 ){
         x += dx;
         y += dy;
     }
