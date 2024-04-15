@@ -52,9 +52,7 @@ vector<vector<int>> get_actions(int playerID,int **mapStat,int **sheepStat, int 
                     int x = i + VALID_DIR[k][0];
                     int y = j + VALID_DIR[k][1];
                     if(x >= 0 && x < mapSize && y >= 0 && y < mapSize && mapStat[x][y] == 0){
-                        for (int m = 1;m < sheepStat[i][j];m++){
-                            actions.push_back({i, j, m, VALID_DIR[k][2]});
-                        }
+                        actions.push_back({i, j, sheepStat[i][j]/2, VALID_DIR[k][2]});
                     }
                 }
             }
@@ -78,7 +76,6 @@ vector<int> get_players(int **mapStat,int mapsize){
 }
 
 bool is_terminal(int **mapStat,int **sheepStat, int mapsize, vector<int> players){
-    
     for(int i = 0; i < 4; i++){
         auto actions = get_actions(players[i], mapStat, sheepStat, mapsize);
         if (actions.size() > 0) {
@@ -154,7 +151,7 @@ void apply_action(int **mapStat, int **sheepStat, vector<int> action, int player
     sheepStat[x][y] -= m;
     int dx = action_map[dir][0];
     int dy = action_map[dir][1];
-    while(0 < x+dx && x+dx < mapSize && 0 < y+dy && y+dy < mapSize && mapStat[x+dx][y+dy] == 0 ){
+    while(0 <= x+dx && x+dx < mapSize && 0 <= y+dy && y+dy < mapSize && mapStat[x+dx][y+dy] == 0 ){
         x += dx;
         y += dy;
     }
